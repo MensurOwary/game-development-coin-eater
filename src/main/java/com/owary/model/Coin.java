@@ -1,11 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.owary.model;
-
-import com.owary.Game;
 
 import java.awt.*;
 
@@ -16,23 +9,23 @@ import java.awt.*;
  */
 public class Coin extends GameObject {
 
-    public Coin(int x, int y, ID id) {
-        super(x, y, id);
-        velX = 3;
-        velY = 3;
+    private int size = 16;
+
+    public Coin(int x, int y) {
+        super(x, y, ID.Coin);
+        velX = 1;
+        velY = 1;
     }
 
     @Override
     public void render(Graphics g) {
-        if (id == ID.Player) g.setColor(Color.red);
-        else g.setColor(Color.BLACK);
-        g.fillOval(x, y, 16, 16);
-
+        g.setColor(Color.BLACK);
+        g.fillOval(x, y, size, size);
     }
 
     @Override
     public Rectangle getBounds() {
-        return new Rectangle(x, y, 16, 16);
+        return new Rectangle(x, y, size, size);
     }
 
 }

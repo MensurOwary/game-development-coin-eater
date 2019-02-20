@@ -4,34 +4,40 @@ import com.owary.action.KeyInput;
 import com.owary.extra.HUD;
 import com.owary.handler.Handler;
 import com.owary.handler.HandlerImpl;
-import com.owary.model.Coin;
-import com.owary.model.Enemy;
-import com.owary.model.ID;
-import com.owary.model.Player;
+import com.owary.model.*;
 
 import java.awt.*;
 import java.awt.image.BufferStrategy;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static java.util.stream.Collectors.groupingBy;
 
 /**
  * @author Grama
  */
 public class Game extends Canvas implements Runnable {
 
-    public static final int WIDTH = 1200, HEIGHT = WIDTH / 2;  // Your game Canvas dimensions.
+    public static final int WIDTH = 1024, HEIGHT = 768;  // Your game Canvas dimensions.
     private Thread thread;
     private Handler handler;
     private HUD hud;
+    private Random random;
     private STATE gameState = STATE.GAME;
     private boolean running = false;
 
-    public Game() {
-        Random rand = new Random();
+    public static void main(String[] args) {
+        new Game();
+    }
+
+    private Game() {
+        handler = new HandlerImpl();
         Player player = new Player(400, 200, ID.Player, handler);
 
-        handler = new HandlerImpl();
+        random = new Random();
         hud = new HUD(player);
 
         this.addKeyListener(new KeyInput(this, player));
@@ -40,16 +46,12 @@ public class Game extends Canvas implements Runnable {
 
         if (gameState == STATE.GAME) {
             handler.addObject(player);
-            handler.addObject(new Enemy(rand.nextInt(WIDTH - 20), rand.nextInt(HEIGHT - 40), ID.Enemy, handler, Color.blue));
-            handler.addObject(new Enemy(rand.nextInt(WIDTH - 20), rand.nextInt(HEIGHT - 40), ID.Enemy, handler, Color.YELLOW));
-            handler.addObject(new Coin(500, 250, ID.Coin));
+//            handler.addObject(getRandomGameObject(ID.Coin));
+//            handler.addObject(getRandomGameObject(ID.Enemy));
         }
 
     }
 
-    public static void main(String[] args) {
-        new Game();
-    }
 
     public static int clamp(int number, int min, int max) {
         if (number >= max) return max;
@@ -63,7 +65,7 @@ public class Game extends Canvas implements Runnable {
         running = true;
     }
 
-    public synchronized void stop() {
+    private synchronized void stop() {
         try {
             thread.join();
             running = false;
@@ -106,10 +108,34 @@ public class Game extends Canvas implements Runnable {
     }
 
     private void tick() {
+        // get current objects
+        List<GameObject> objects = handler.getObjects();
+        // get objects based on their IDs
+        Map<ID, List<GameObject>> collect = objects
+                .stream()
+                .collect(groupingBy(GameObject::getId));
+
+        // for each ID category, if there's no object in the field, generate one
+        for (ID key : ID.values()) {
+            if (!collect.containsKey(key) || (collect.containsKey(key) && collect.get(key).isEmpty())){
+                handler.addObject(getRandomGameObject(key));
+            }
+        }
+
         handler.tick();
         if (gameState == STATE.GAME) {
             hud.tick();
         }
+    }
+
+    private GameObject getRandomGameObject(ID key) {
+        switch (key){
+            case Coin:
+                return new Coin(random.nextInt(WIDTH - 20), random.nextInt(HEIGHT - 40));
+            case Enemy:
+                return new Enemy(random.nextInt(WIDTH - 20), random.nextInt(HEIGHT - 40));
+        }
+        return null;
     }
 
     private void render() {

@@ -3,6 +3,7 @@ package com.owary.handler;
 import com.owary.model.GameObject;
 
 import java.awt.*;
+import java.util.List;
 
 public interface Handler {
 
@@ -10,5 +11,6 @@ public interface Handler {
     void render(Graphics g);
     void addObject(GameObject object);
     void removeObject(GameObject object);
+    List<GameObject> getObjects();
 
 }

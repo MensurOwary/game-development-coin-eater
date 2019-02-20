@@ -56,6 +56,7 @@ public class KeyInput extends KeyAdapter {
             if (key == KeyEvent.VK_RIGHT) {
                 player.getKeyPressed()[2] = true;
             }
+
             if (key == KeyEvent.VK_SPACE) {
 
             }

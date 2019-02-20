@@ -5,6 +5,9 @@ import com.owary.handler.Handler;
 import com.owary.handler.HandlerImpl;
 
 import java.awt.*;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 /**
@@ -19,39 +22,32 @@ public class Player extends GameObject {
 
     private int width = 50;
     private int height = 50;
-    private int health = 0;
+    private int health = 100;
     private int score = 0;
 
     public Player(int x, int y, ID id, Handler handler) {
         super(x, y, id);
-
         this.handler = handler;
-
-        this.keyPressed[0] = false;
-        this.keyPressed[1] = false;
-        this.keyPressed[2] = false;
-        this.keyPressed[3] = false;
-        this.keyPressed[4] = false;
-
     }
 
     @Override
     public void tick() {
-
-        if (keyPressed[1])
+        handleCollision();
+        if (keyPressed[1]) {
             setVelX(-10);
-        else if (keyPressed[2])
+        }else if (keyPressed[2]) {
             setVelX(10);
-        else
+        }else {
             velX = 0;
+        }
 
-        if (keyPressed[3])
+        if (keyPressed[3]) {
             setVelY(-10);
-        else if (keyPressed[4])
+        }else if (keyPressed[4]) {
             setVelY(10);
-        else
+        }else {
             velY = 0;
-
+        }
         x += velX;
         y += velY;
 
@@ -61,10 +57,8 @@ public class Player extends GameObject {
 
     @Override
     public void render(Graphics g) {
-
         g.setColor(Color.white);
         g.fillOval(x, y, width, height);
-
     }
 
     @Override
@@ -82,5 +76,48 @@ public class Player extends GameObject {
 
     public boolean[] getKeyPressed() {
         return keyPressed;
+    }
+
+    private List<GameObject> getCollidedObjects(){
+        return this.handler
+                .getObjects()
+                .parallelStream()
+                .filter(e -> e.getBounds().intersects(this.getBounds()))
+                .filter(e->e!=this)
+                .collect(Collectors.toList());
+    }
+
+    private void handleCollision(){
+        final List<GameObject> gameObjects = getCollidedObjects();
+        if(!gameObjects.isEmpty()){
+
+            Map<ID, List<GameObject>> collect = gameObjects
+                    .stream()
+                    .collect(Collectors.groupingBy(GameObject::getId));
+
+            if (collect.containsKey(ID.Coin)) {
+                List<GameObject> coins = collect.get(ID.Coin);
+                int size = coins.size();
+                score += size*10;
+                if (score>100){
+                    score = 100;
+                }
+                if (!coins.isEmpty()) {
+                    this.handler.removeObject(coins.get(0));
+                }
+            }
+
+            if (collect.containsKey(ID.Enemy)) {
+                List<GameObject> enemies = collect.get(ID.Enemy);
+                int size = enemies.size();
+                health -= size*5;
+                if (health < 0){
+                    health = 0;
+                }
+                if (!enemies.isEmpty()) {
+                    this.handler.removeObject(enemies.get(0));
+                }
+            }
+        }
     }
 }

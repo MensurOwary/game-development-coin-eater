@@ -1,16 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.owary.handler;
 
 import com.owary.model.GameObject;
 
 import java.awt.*;
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Our best friend in Game which will handle updating and rendering all GameObjects existing in the game scene and bunch of other functions.
@@ -21,28 +17,41 @@ public class HandlerImpl implements Handler, Serializable {
     private List<GameObject> objects;
 
     public HandlerImpl(){
-        this.objects = new ArrayList<>();
+        this.objects = new LinkedList<>();
     }
 
+    @Override
     public void tick() {
-        for (int i = 0; i < objects.size(); i++) {
-            GameObject tempObject = objects.get(i);
-            if (tempObject != null) tempObject.tick();
-        }
+        objects
+                .stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList())
+                .forEach(GameObject::tick);
     }
 
+    @Override
     public void render(Graphics g) {
-        for (int i = 0; i < objects.size(); i++) {
-            GameObject tempObject = objects.get(i);
-            if (tempObject != null) tempObject.render(g);
-        }
+        objects
+                .stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList())
+                .forEach(e->e.render(g));
     }
 
+    @Override
     public void addObject(GameObject object) {
-        this.objects.add(object);
+        if (object != null)
+            this.objects.add(object);
     }
 
+    @Override
     public void removeObject(GameObject object) {
-        this.objects.remove(object);
+        if (object != null)
+            this.objects.removeIf(next -> next == object);
+    }
+
+    @Override
+    public List<GameObject> getObjects() {
+        return objects;
     }
 }
