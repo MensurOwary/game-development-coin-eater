@@ -6,6 +6,7 @@ import com.owary.model.Player;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.Arrays;
 
 /**
  * Simplest Keyboard representation which takes keyboard actions and sending integer type information
@@ -16,10 +17,10 @@ import java.awt.event.KeyEvent;
 public class KeyInput extends KeyAdapter {
     private Game game;
 
-    private Player player;
+    private Player[] players;
 
-    public KeyInput(Game game, Player player) {
-        this.player = player;
+    public KeyInput(Game game, Player...players) {
+        this.players = players;
         this.game = game;
     }
 
@@ -29,38 +30,12 @@ public class KeyInput extends KeyAdapter {
         int key = e.getKeyCode();
         if (key == KeyEvent.VK_ESCAPE) System.exit(0);
 
-
-        if (player.getId() == ID.Player) {
-            if (key == KeyEvent.VK_W) {
-                player.getKeyPressed()[3] = true;
+        for (Player player : players) {
+            PlayerControlMapper controlMapper = player.getControlMapper();
+            int control = controlMapper.getControl(key);
+            if (control != -1){
+                player.keyPressed(control);
             }
-            if (key == KeyEvent.VK_A) {
-                player.getKeyPressed()[1] = true;
-            }
-            if (key == KeyEvent.VK_S) {
-                player.getKeyPressed()[4] = true;
-            }
-            if (key == KeyEvent.VK_D) {
-                player.getKeyPressed()[2] = true;
-            }
-
-            if (key == KeyEvent.VK_UP) {
-                player.getKeyPressed()[3] = true;
-            }
-            if (key == KeyEvent.VK_LEFT) {
-                player.getKeyPressed()[1] = true;
-            }
-            if (key == KeyEvent.VK_DOWN) {
-                player.getKeyPressed()[4] = true;
-            }
-            if (key == KeyEvent.VK_RIGHT) {
-                player.getKeyPressed()[2] = true;
-            }
-
-            if (key == KeyEvent.VK_SPACE) {
-
-            }
-
         }
     }
 
@@ -68,15 +43,12 @@ public class KeyInput extends KeyAdapter {
     public void keyReleased(KeyEvent e) {
         int key = e.getKeyCode();
 
-        if (player.getId() == ID.Player) {
-            if (key == KeyEvent.VK_W) player.getKeyPressed()[3] = false;
-            if (key == KeyEvent.VK_A) player.getKeyPressed()[1] = false;
-            if (key == KeyEvent.VK_S) player.getKeyPressed()[4] = false;
-            if (key == KeyEvent.VK_D) player.getKeyPressed()[2] = false;
-            if (key == KeyEvent.VK_UP) player.getKeyPressed()[3] = false;
-            if (key == KeyEvent.VK_LEFT) player.getKeyPressed()[1] = false;
-            if (key == KeyEvent.VK_DOWN) player.getKeyPressed()[4] = false;
-            if (key == KeyEvent.VK_RIGHT) player.getKeyPressed()[2] = false;
+        for (Player player : players) {
+            PlayerControlMapper controlMapper = player.getControlMapper();
+            int control = controlMapper.getControl(key);
+            if (control != -1){
+                player.keyReleased(control);
+            }
         }
 
     }

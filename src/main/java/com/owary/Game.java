@@ -5,6 +5,7 @@ import com.owary.extra.HUD;
 import com.owary.handler.Handler;
 import com.owary.handler.HandlerImpl;
 import com.owary.model.*;
+import com.owary.utils.Utils;
 
 import java.awt.*;
 import java.awt.image.BufferStrategy;
@@ -35,17 +36,19 @@ public class Game extends Canvas implements Runnable {
 
     private Game() {
         handler = new HandlerImpl();
-        Player player = new Player(400, 200, ID.Player, handler);
+        Player playerOne = new Player(400, 200, handler, Utils.getWASDControl());
+        Player playerTwo = new Player(100, 200, handler, Utils.getArrowControl());
 
         random = new Random();
-        hud = new HUD(player);
+        hud = new HUD(playerOne);
 
-        this.addKeyListener(new KeyInput(this, player));
+        this.addKeyListener(new KeyInput(this, playerOne, playerTwo));
 
         Window.start(WIDTH, HEIGHT, "GD by Sayid Akhundov - Our First game ;)", this);
 
         if (gameState == STATE.GAME) {
-            handler.addObject(player);
+            handler.addObject(playerOne);
+            handler.addObject(playerTwo);
 //            handler.addObject(getRandomGameObject(ID.Coin));
 //            handler.addObject(getRandomGameObject(ID.Enemy));
         }

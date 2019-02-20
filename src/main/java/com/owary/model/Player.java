@@ -1,8 +1,8 @@
 package com.owary.model;
 
 import com.owary.Game;
+import com.owary.action.PlayerControlMapper;
 import com.owary.handler.Handler;
-import com.owary.handler.HandlerImpl;
 
 import java.awt.*;
 import java.util.List;
@@ -25,9 +25,12 @@ public class Player extends GameObject {
     private int health = 100;
     private int score = 0;
 
-    public Player(int x, int y, ID id, Handler handler) {
-        super(x, y, id);
+    private PlayerControlMapper controlMapper;
+
+    public Player(int x, int y, Handler handler, PlayerControlMapper controlMapper) {
+        super(x, y, ID.Player);
         this.handler = handler;
+        this.controlMapper = controlMapper;
     }
 
     @Override
@@ -74,8 +77,16 @@ public class Player extends GameObject {
         return score;
     }
 
-    public boolean[] getKeyPressed() {
-        return keyPressed;
+    public PlayerControlMapper getControlMapper() {
+        return controlMapper;
+    }
+
+    public void keyPressed(int index){
+        keyPressed[index] = true;
+    }
+
+    public void keyReleased(int index){
+        keyPressed[index] = false;
     }
 
     private List<GameObject> getCollidedObjects(){
@@ -120,4 +131,5 @@ public class Player extends GameObject {
             }
         }
     }
+
 }
