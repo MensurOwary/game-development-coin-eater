@@ -1,4 +1,4 @@
-package com.owary.model;
+package com.owary.model.types;
 
 /**
  * Enum representing the GameObject types in the Game.
@@ -6,5 +6,5 @@ package com.owary.model;
  * @author Sayid Akhundov
  */
 public enum ID {
-    Player, Enemy, Coin
+    Player, Enemy, Coin, Health
 }

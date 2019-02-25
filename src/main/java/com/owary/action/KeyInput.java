@@ -1,12 +1,10 @@
 package com.owary.action;
 
 import com.owary.Game;
-import com.owary.model.ID;
-import com.owary.model.Player;
+import com.owary.model.player.Player;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.Arrays;
 
 /**
  * Simplest Keyboard representation which takes keyboard actions and sending integer type information
@@ -15,9 +13,9 @@ import java.util.Arrays;
  * @author Sayid Akhundov
  */
 public class KeyInput extends KeyAdapter {
-    private Game game;
+    private final Game game;
 
-    private Player[] players;
+    private final Player[] players;
 
     public KeyInput(Game game, Player...players) {
         this.players = players;

@@ -1,8 +1,13 @@
-package com.owary.model;
+package com.owary.model.player;
 
 import com.owary.Game;
 import com.owary.action.PlayerControlMapper;
 import com.owary.handler.Handler;
+import com.owary.model.GameObject;
+import com.owary.model.coin.Coin;
+import com.owary.model.enemy.Enemy;
+import com.owary.model.health.Health;
+import com.owary.model.types.ID;
 
 import java.awt.*;
 import java.util.List;
@@ -16,21 +21,23 @@ import java.util.stream.Collectors;
  * @author Sayid Akhundov
  */
 public class Player extends GameObject {
-    private Handler handler;
+    private final Handler handler;
 
-    private boolean[] keyPressed = new boolean[5];
+    private final boolean[] keyPressed = new boolean[5];
 
-    private int width = 50;
-    private int height = 50;
     private int health = 100;
     private int score = 0;
 
-    private PlayerControlMapper controlMapper;
+    private final PlayerControlMapper controlMapper;
 
     public Player(int x, int y, Handler handler, PlayerControlMapper controlMapper) {
         super(x, y, ID.Player);
         this.handler = handler;
         this.controlMapper = controlMapper;
+        this.characterImage = "assets/images/players/pig.png";
+        this.defaultColor = Color.WHITE;
+        this.height = 50;
+        this.width = 50;
     }
 
     @Override
@@ -56,12 +63,6 @@ public class Player extends GameObject {
 
         x = Game.clamp(x, 0, Game.WIDTH - (width + 5));
         y = Game.clamp(y, 0, Game.HEIGHT - (height + 18));
-    }
-
-    @Override
-    public void render(Graphics g) {
-        g.setColor(Color.white);
-        g.fillOval(x, y, width, height);
     }
 
     @Override
@@ -108,25 +109,33 @@ public class Player extends GameObject {
 
             if (collect.containsKey(ID.Coin)) {
                 List<GameObject> coins = collect.get(ID.Coin);
-                int size = coins.size();
-                score += size*10;
-                if (score>100){
-                    score = 100;
-                }
+
                 if (!coins.isEmpty()) {
-                    this.handler.removeObject(coins.get(0));
+                    Coin coin = (Coin) coins.get(0);
+                    score += coin.getWeight();
+                    this.handler.removeObject(coin);
+                }
+            }
+
+            if (collect.containsKey(ID.Health)) {
+                List<GameObject> healths = collect.get(ID.Health);
+
+                if (!healths.isEmpty()) {
+                    Health healthObj = (Health) healths.get(0);
+                    health += healthObj.getWeight();
+                    if (health > 100) {health = 100;}
+                    this.handler.removeObject(healthObj);
                 }
             }
 
             if (collect.containsKey(ID.Enemy)) {
                 List<GameObject> enemies = collect.get(ID.Enemy);
-                int size = enemies.size();
-                health -= size*5;
-                if (health < 0){
-                    health = 0;
-                }
+
                 if (!enemies.isEmpty()) {
-                    this.handler.removeObject(enemies.get(0));
+                    Enemy enemy = (Enemy) enemies.get(0);
+                    health -= enemy.getWeight();
+                    if (health <= 0) {health = 0;}
+                    this.handler.removeObject(enemy);
                 }
             }
         }

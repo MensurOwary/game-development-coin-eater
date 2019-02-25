@@ -1,42 +1,49 @@
 package com.owary;
 
 import com.owary.action.KeyInput;
+import com.owary.adjustments.Strategy;
 import com.owary.extra.HUD;
 import com.owary.handler.Handler;
 import com.owary.handler.HandlerImpl;
-import com.owary.model.*;
+import com.owary.model.player.Player;
+import com.owary.model.types.ID;
 import com.owary.utils.Utils;
+import com.owary.adjustments.Level;
 
 import java.awt.*;
 import java.awt.image.BufferStrategy;
-import java.util.List;
-import java.util.Map;
 import java.util.Random;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static java.util.stream.Collectors.groupingBy;
 
 /**
  * @author Grama
  */
 public class Game extends Canvas implements Runnable {
 
-    public static final int WIDTH = 1024, HEIGHT = 768;  // Your game Canvas dimensions.
+    public static int WIDTH, HEIGHT;  // Your game Canvas dimensions.
     private Thread thread;
-    private Handler handler;
-    private HUD hud;
-    private Random random;
-    private STATE gameState = STATE.GAME;
+    private final Handler handler;
+    private final HUD hud;
+    private final Random random;
+    private Level level;
+    private final STATE gameState = STATE.GAME;
     private boolean running = false;
+
+    private final Player playerOne;
 
     public static void main(String[] args) {
         new Game();
     }
 
     private Game() {
+        final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+
+        WIDTH = screenSize.width;
+        HEIGHT = screenSize.height;
+
+        level = Level.ONE;
         handler = new HandlerImpl();
-        Player playerOne = new Player(400, 200, handler, Utils.getWASDControl());
+        playerOne = new Player(400, 200, handler, Utils.getArrowControl());
         Player playerTwo = new Player(100, 200, handler, Utils.getArrowControl());
 
         random = new Random();
@@ -44,13 +51,11 @@ public class Game extends Canvas implements Runnable {
 
         this.addKeyListener(new KeyInput(this, playerOne, playerTwo));
 
-        Window.start(WIDTH, HEIGHT, "GD by Sayid Akhundov - Our First game ;)", this);
+        Window.start(WIDTH, HEIGHT, "The Game", this);
 
         if (gameState == STATE.GAME) {
             handler.addObject(playerOne);
-            handler.addObject(playerTwo);
-//            handler.addObject(getRandomGameObject(ID.Coin));
-//            handler.addObject(getRandomGameObject(ID.Enemy));
+//            handler.addObject(playerTwo);
         }
 
     }
@@ -73,7 +78,7 @@ public class Game extends Canvas implements Runnable {
             thread.join();
             running = false;
         } catch (InterruptedException ex) {
-            Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Game.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
 
     }
@@ -111,18 +116,10 @@ public class Game extends Canvas implements Runnable {
     }
 
     private void tick() {
-        // get current objects
-        List<GameObject> objects = handler.getObjects();
-        // get objects based on their IDs
-        Map<ID, List<GameObject>> collect = objects
-                .stream()
-                .collect(groupingBy(GameObject::getId));
+        level = getCurrentLevel(playerOne);
 
-        // for each ID category, if there's no object in the field, generate one
         for (ID key : ID.values()) {
-            if (!collect.containsKey(key) || (collect.containsKey(key) && collect.get(key).isEmpty())){
-                handler.addObject(getRandomGameObject(key));
-            }
+            Strategy.generateGameObject(key, level, handler);
         }
 
         handler.tick();
@@ -131,14 +128,17 @@ public class Game extends Canvas implements Runnable {
         }
     }
 
-    private GameObject getRandomGameObject(ID key) {
-        switch (key){
-            case Coin:
-                return new Coin(random.nextInt(WIDTH - 20), random.nextInt(HEIGHT - 40));
-            case Enemy:
-                return new Enemy(random.nextInt(WIDTH - 20), random.nextInt(HEIGHT - 40));
+    private Level getCurrentLevel(Player playerOne) {
+        int score = playerOne.getScore();
+        Level currentLevel = Level.ONE;
+        if (score >= 0 && score <= 100){
+            currentLevel = Level.ONE;
+        }else if(score > 100 && score <= 200){
+            currentLevel = Level.TWO;
+        }else if(score > 200){
+            currentLevel = Level.THREE;
         }
-        return null;
+        return currentLevel;
     }
 
     private void render() {
@@ -149,7 +149,7 @@ public class Game extends Canvas implements Runnable {
             return;
         }
         Graphics g = bs.getDrawGraphics();
-        g.setColor(Color.PINK);
+        g.setColor(Color.BLACK);
         g.fillRect(0, 0, WIDTH, HEIGHT);
 
         handler.render(g);

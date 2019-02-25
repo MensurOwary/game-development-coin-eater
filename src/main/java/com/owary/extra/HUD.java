@@ -1,6 +1,6 @@
 package com.owary.extra;
 
-import com.owary.model.Player;
+import com.owary.model.player.Player;
 
 import java.awt.*;
 
@@ -11,7 +11,7 @@ import java.awt.*;
  */
 public class HUD {
 
-    private Player player;
+    private final Player player;
 
     public HUD(Player player) {
         this.player = player;
@@ -25,9 +25,9 @@ public class HUD {
         int health = player.getHealth();
         int score = player.getScore();
 
-        g.setColor(Color.gray);
+        g.setColor(new Color(128, 128, 128, 50));
         g.fillRect(15, 15, 200, 32);
-        g.setColor(new Color(255 - health * 2, health * 2, 0));
+        g.setColor(new Color(255 - health * 2, health * 2, 0, 50));
 
         g.fillRect(15, 15, health * 2, 32);
         g.setColor(Color.white);

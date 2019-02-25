@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  * @author Sayid Akhundov
  */
 public class HandlerImpl implements Handler, Serializable {
-    private List<GameObject> objects;
+    private final List<GameObject> objects;
 
     public HandlerImpl(){
         this.objects = new LinkedList<>();

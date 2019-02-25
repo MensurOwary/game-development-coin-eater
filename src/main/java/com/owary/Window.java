@@ -10,7 +10,7 @@ import java.awt.*;
  *
  * @author Sayid Akhundov
  */
-public class Window {
+class Window {
 
     private Window(int width, int height, String title, Game game) {
         JFrame frame = new JFrame(title);
@@ -19,8 +19,12 @@ public class Window {
         frame.setMaximumSize(new Dimension(width, height));
         frame.setMinimumSize(new Dimension(width, height));
 
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        frame.setUndecorated(true);
+        frame.setVisible(true);
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setResizable(true);
+        frame.setResizable(false);
         frame.setLocationRelativeTo(null);
         frame.add(game);
 

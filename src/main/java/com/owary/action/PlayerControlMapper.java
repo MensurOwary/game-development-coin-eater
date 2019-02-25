@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class PlayerControlMapper {
 
-    private HashMap<Integer, Integer> controlMap;
+    private final HashMap<Integer, Integer> controlMap;
 
     public PlayerControlMapper(){
         controlMap = new HashMap<>();

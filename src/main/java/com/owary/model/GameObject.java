@@ -1,9 +1,11 @@
 package com.owary.model;
 
 import com.owary.Game;
-import com.owary.model.ID;
+import com.owary.model.types.ID;
+import com.owary.utils.ResourceUtils;
 
 import java.awt.*;
+import java.io.IOException;
 import java.io.Serializable;
 
 /**
@@ -12,9 +14,18 @@ import java.io.Serializable;
  * @author Sayid Akhundov
  */
 public abstract class GameObject implements Serializable {
-    protected int x, y;
+    protected int x;
+    protected int y;
+    protected int velX;
+    protected int velY;
+
+    protected int height;
+    protected int width;
+
     protected ID id;
-    protected int velX, velY;
+    protected Color defaultColor;
+
+    protected String characterImage;
 
     public GameObject(int x, int y, ID id) {
         this.x = x;
@@ -26,7 +37,7 @@ public abstract class GameObject implements Serializable {
         return velX;
     }
 
-    public void setVelX(int velX) {
+    protected void setVelX(int velX) {
         this.velX = velX;
     }
 
@@ -34,7 +45,7 @@ public abstract class GameObject implements Serializable {
         return velY;
     }
 
-    public void setVelY(int velY) {
+    protected void setVelY(int velY) {
         this.velY = velY;
     }
 
@@ -62,7 +73,29 @@ public abstract class GameObject implements Serializable {
         this.y = y;
     }
 
-    public abstract Rectangle getBounds();
+    public String getCharacterImage() {
+        return characterImage;
+    }
+
+    public void setCharacterImage(String characterImage) {
+        this.characterImage = characterImage;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
 
     public void tick() {
         x += velX;
@@ -72,5 +105,18 @@ public abstract class GameObject implements Serializable {
         if (x >= Game.WIDTH - 16 || x <= 0) velX *= -1;
     }
 
-    public abstract void render(Graphics g);
+    public void render(Graphics g) {
+        try {
+            g.setColor(new Color(0,0,0,0));
+            g.fillOval(x, y, width, height);
+            Image resource = ResourceUtils.getResourceOf(this);
+            g.drawImage(resource, x, y, null);
+        } catch (IOException | NullPointerException e) {
+            g.setColor(defaultColor);
+            g.fillRect(x, y, width, height);
+            System.out.println("Resource is null, fallback to a color");
+        }
+    }
+
+    public abstract Rectangle getBounds();
 }
