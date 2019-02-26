@@ -3,18 +3,21 @@ package com.owary;
 import com.owary.action.KeyInput;
 import com.owary.adjustments.Strategy;
 import com.owary.extra.HUD;
+import com.owary.extra.StartMenu;
 import com.owary.handler.Handler;
 import com.owary.handler.HandlerImpl;
-import com.owary.model.enemy.Bomb;
 import com.owary.model.player.Player;
 import com.owary.model.types.ID;
+import com.owary.model.types.State;
 import com.owary.utils.Utils;
 import com.owary.adjustments.Level;
 
 import java.awt.*;
 import java.awt.image.BufferStrategy;
-import java.util.Random;
 import java.util.logging.Logger;
+
+import static com.owary.model.types.State.GAME;
+import static com.owary.model.types.State.MENU;
 
 /**
  * @author Grama
@@ -25,8 +28,9 @@ public class Game extends Canvas implements Runnable {
     private Thread thread;
     private final Handler handler;
     private final HUD hud;
+    private final StartMenu menu;
     private Level level;
-    private final STATE gameState = STATE.GAME;
+    private final State gameState = GAME;
     private boolean running = false;
 
     private final Player playerOne;
@@ -46,12 +50,13 @@ public class Game extends Canvas implements Runnable {
         playerOne = new Player(400, 200, handler, Utils.getArrowControl());
 
         hud = new HUD(playerOne);
+        menu = new StartMenu(screenSize);
 
         this.addKeyListener(new KeyInput(this, playerOne));
 
         Window.start(WIDTH, HEIGHT, "The Game", this);
 
-        if (gameState == STATE.GAME) {
+        if (gameState == GAME) {
             handler.addObject(playerOne);
         }
 
@@ -112,16 +117,14 @@ public class Game extends Canvas implements Runnable {
     }
 
     private void tick() {
-        level = getCurrentLevel(playerOne);
-
-        for (ID key : ID.values()) {
-            Strategy.generateGameObject(key, level, handler);
-        }
-
-        handler.tick();
-        if (gameState == STATE.GAME) {
+        if (gameState == GAME) {
             hud.tick();
+            level = getCurrentLevel(playerOne);
+            for (ID key : ID.values()) {
+                Strategy.generateGameObject(key, level, handler);
+            }
         }
+        handler.tick();
     }
 
     private Level getCurrentLevel(Player playerOne) {
@@ -148,28 +151,16 @@ public class Game extends Canvas implements Runnable {
         }
         Graphics g = bs.getDrawGraphics();
 
-        g.setColor(Color.PINK);
-        g.fillRect(0, 0, WIDTH, HEIGHT);
 
-        handler.render(g);
-
-        if (gameState == STATE.GAME) {
-
+        if (gameState == GAME) {
+            g.setColor(Color.PINK);
+            g.fillRect(0, 0, WIDTH, HEIGHT);
             hud.render(g);
+            handler.render(g);
+        }else if (gameState == MENU) {
+            menu.render(g);
         }
         g.dispose();
         bs.show();
     }
-
-    /*
-     *You will not use this enum in our project, however its very common for game Menues .
-     */
-    private enum STATE {
-        MENU,
-        GAME,
-        HELP,
-        OPTIONS
-    }
-
-
 }
