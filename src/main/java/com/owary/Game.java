@@ -5,6 +5,7 @@ import com.owary.adjustments.Strategy;
 import com.owary.extra.HUD;
 import com.owary.handler.Handler;
 import com.owary.handler.HandlerImpl;
+import com.owary.model.enemy.Bomb;
 import com.owary.model.player.Player;
 import com.owary.model.types.ID;
 import com.owary.utils.Utils;
@@ -24,7 +25,6 @@ public class Game extends Canvas implements Runnable {
     private Thread thread;
     private final Handler handler;
     private final HUD hud;
-    private final Random random;
     private Level level;
     private final STATE gameState = STATE.GAME;
     private boolean running = false;
@@ -44,22 +44,18 @@ public class Game extends Canvas implements Runnable {
         level = Level.ONE;
         handler = new HandlerImpl();
         playerOne = new Player(400, 200, handler, Utils.getArrowControl());
-        Player playerTwo = new Player(100, 200, handler, Utils.getArrowControl());
 
-        random = new Random();
         hud = new HUD(playerOne);
 
-        this.addKeyListener(new KeyInput(this, playerOne, playerTwo));
+        this.addKeyListener(new KeyInput(this, playerOne));
 
         Window.start(WIDTH, HEIGHT, "The Game", this);
 
         if (gameState == STATE.GAME) {
             handler.addObject(playerOne);
-//            handler.addObject(playerTwo);
         }
 
     }
-
 
     public static int clamp(int number, int min, int max) {
         if (number >= max) return max;
@@ -135,8 +131,10 @@ public class Game extends Canvas implements Runnable {
             currentLevel = Level.ONE;
         }else if(score > 100 && score <= 200){
             currentLevel = Level.TWO;
-        }else if(score > 200){
+        }else if(score > 200 && score <= 300){
             currentLevel = Level.THREE;
+        }else if(score > 300){
+            currentLevel = Level.FOUR;
         }
         return currentLevel;
     }
@@ -149,7 +147,8 @@ public class Game extends Canvas implements Runnable {
             return;
         }
         Graphics g = bs.getDrawGraphics();
-        g.setColor(Color.BLACK);
+
+        g.setColor(Color.PINK);
         g.fillRect(0, 0, WIDTH, HEIGHT);
 
         handler.render(g);

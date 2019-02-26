@@ -33,29 +33,28 @@ public abstract class GameObject implements Serializable {
         this.id = id;
     }
 
-    public int getVelX() {
-        return velX;
+    public void tick() {
+        x += velX;
+        y += velY;
+
+        if (y >= Game.HEIGHT - 40 || y <= 0) velY *= -1;
+        if (x >= Game.WIDTH - 16 || x <= 0) velX *= -1;
     }
 
-    protected void setVelX(int velX) {
-        this.velX = velX;
+    public void render(Graphics g) {
+        try {
+            g.setColor(new Color(0,0,0,0));
+            g.fillOval((int) x, (int) y, (int) width, (int) height);
+            Image resource = ResourceUtils.getResourceOf(this);
+            g.drawImage(resource, (int) x, (int) y, null);
+        } catch (IOException | NullPointerException e) {
+            g.setColor(defaultColor);
+            g.fillRect((int) x, (int) y, (int) width, (int) height);
+            System.out.println("Resource is null, fallback to a color");
+        }
     }
 
-    public int getVelY() {
-        return velY;
-    }
-
-    protected void setVelY(int velY) {
-        this.velY = velY;
-    }
-
-    public ID getId() {
-        return id;
-    }
-
-    public void setId(ID id) {
-        this.id = id;
-    }
+    public abstract Rectangle getBounds();
 
     public int getX() {
         return x;
@@ -73,12 +72,20 @@ public abstract class GameObject implements Serializable {
         this.y = y;
     }
 
-    public String getCharacterImage() {
-        return characterImage;
+    public int getVelX() {
+        return velX;
     }
 
-    public void setCharacterImage(String characterImage) {
-        this.characterImage = characterImage;
+    public void setVelX(int velX) {
+        this.velX = velX;
+    }
+
+    public int getVelY() {
+        return velY;
+    }
+
+    public void setVelY(int velY) {
+        this.velY = velY;
     }
 
     public int getHeight() {
@@ -97,26 +104,27 @@ public abstract class GameObject implements Serializable {
         this.width = width;
     }
 
-    public void tick() {
-        x += velX;
-        y += velY;
-
-        if (y >= Game.HEIGHT - 40 || y <= 0) velY *= -1;
-        if (x >= Game.WIDTH - 16 || x <= 0) velX *= -1;
+    public ID getId() {
+        return id;
     }
 
-    public void render(Graphics g) {
-        try {
-            g.setColor(new Color(0,0,0,0));
-            g.fillOval(x, y, width, height);
-            Image resource = ResourceUtils.getResourceOf(this);
-            g.drawImage(resource, x, y, null);
-        } catch (IOException | NullPointerException e) {
-            g.setColor(defaultColor);
-            g.fillRect(x, y, width, height);
-            System.out.println("Resource is null, fallback to a color");
-        }
+    public void setId(ID id) {
+        this.id = id;
     }
 
-    public abstract Rectangle getBounds();
+    public Color getDefaultColor() {
+        return defaultColor;
+    }
+
+    public void setDefaultColor(Color defaultColor) {
+        this.defaultColor = defaultColor;
+    }
+
+    public String getCharacterImage() {
+        return characterImage;
+    }
+
+    public void setCharacterImage(String characterImage) {
+        this.characterImage = characterImage;
+    }
 }

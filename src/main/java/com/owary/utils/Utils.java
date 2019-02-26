@@ -6,6 +6,7 @@ import com.owary.model.coin.Coin;
 import com.owary.model.enemy.Bomb;
 import com.owary.model.enemy.Chuck;
 import com.owary.model.GameObject;
+import com.owary.model.enemy.Terence;
 import com.owary.model.health.Health;
 import com.owary.model.types.ID;
 import com.owary.model.enemy.Red;
@@ -22,18 +23,22 @@ public class Utils {
     private static final Random random = new Random();
 
     public static GameObject getRandomGameObject(ID key, Level level) {
+        int randomX = random.nextInt(WIDTH - 20);
+        int randomY = random.nextInt(HEIGHT - 40);
         switch (key){
             case Coin:
-                return new Coin(random.nextInt(WIDTH - 20), random.nextInt(HEIGHT - 40));
+                return new Coin(randomX, randomY);
             case Health:
-                return new Health(random.nextInt(WIDTH - 20), random.nextInt(HEIGHT - 40));
+                return new Health(randomX, randomY);
             case Enemy:
                 if (level.equals(Level.ONE)){
-                    return new Red(random.nextInt(WIDTH - 20), random.nextInt(HEIGHT - 40));
+                    return new Red(randomX, randomY);
                 }else if(level.equals(Level.TWO)){
-                    return new Chuck(random.nextInt(WIDTH - 20), random.nextInt(HEIGHT - 40));
+                    return new Chuck(randomX, randomY);
                 }else if(level.equals(Level.THREE)){
-                    return new Bomb(random.nextInt(WIDTH - 20), random.nextInt(HEIGHT - 40));
+                    return new Bomb(randomX, randomY);
+                }else if(level.equals(Level.FOUR)){
+                    return new Terence(randomX, randomY);
                 }
         }
         return null;

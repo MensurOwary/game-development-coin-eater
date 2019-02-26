@@ -15,8 +15,8 @@ public class ResourceUtils {
 
     public static Image getResourceOf(GameObject go) throws IOException, NullPointerException {
         if (!scaledInstances.containsKey(go.getCharacterImage())) {
-            int height = go.getHeight();
-            int width = go.getWidth();
+            double height = go.getHeight();
+            double width = go.getWidth();
             String characterImage = go.getCharacterImage();
 //            InputStream imageStream = ResourceUtils.class.getClassLoader().getResourceAsStream(characterImage);
             InputStream imageStream = ClassLoader.getSystemClassLoader().getResourceAsStream(characterImage);
@@ -25,7 +25,7 @@ public class ResourceUtils {
                 throw new NullPointerException();
             }
 
-            Image scaledInstance = ImageIO.read(imageStream).getScaledInstance(width, height, 0);
+            Image scaledInstance = ImageIO.read(imageStream).getScaledInstance((int)width, (int)height, 0);
             scaledInstances.put(characterImage, scaledInstance);
 
             imageStream.close();

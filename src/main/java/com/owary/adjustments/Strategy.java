@@ -37,6 +37,10 @@ public class Strategy {
             enemyCount = 5;
             coinCount = 1;
             healthCount = 2;
+        }else if(level.equals(Level.FOUR)){
+            enemyCount = 5;
+            coinCount = 1;
+            healthCount = 1;
         }
 
         int counter;

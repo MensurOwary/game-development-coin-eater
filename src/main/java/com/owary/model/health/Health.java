@@ -20,7 +20,7 @@ public class Health extends GameObject implements Weighted {
 
     @Override
     public Rectangle getBounds() {
-        return new Rectangle(x, y, width, height);
+        return new Rectangle((int)x, (int)y, (int)width, (int)height);
     }
 
     @Override

@@ -38,6 +38,8 @@ public class Player extends GameObject {
         this.defaultColor = Color.WHITE;
         this.height = 50;
         this.width = 50;
+
+        this.handler.setPlayer(this);
     }
 
     @Override
@@ -61,13 +63,13 @@ public class Player extends GameObject {
         x += velX;
         y += velY;
 
-        x = Game.clamp(x, 0, Game.WIDTH - (width + 5));
-        y = Game.clamp(y, 0, Game.HEIGHT - (height + 18));
+        x = Game.clamp((int) x, 0, (int)(Game.WIDTH - (width + 5)));
+        y = Game.clamp((int) y, 0, (int)(Game.HEIGHT - (height + 18)));
     }
 
     @Override
     public Rectangle getBounds() {
-        return new Rectangle(x, y, width, height);
+        return new Rectangle((int) x, (int) y, (int) width, (int) height);
     }
 
     public int getHealth() {
