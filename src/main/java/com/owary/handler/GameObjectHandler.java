@@ -15,11 +15,11 @@ import java.util.stream.Collectors;
  *
  * @author Sayid Akhundov
  */
-public class HandlerImpl implements Handler, Serializable {
+public class GameObjectHandler implements Handler<GameObject>, Serializable {
     private final List<GameObject> objects;
     private Player player;
 
-    public HandlerImpl(){
+    public GameObjectHandler(){
         this.objects = new LinkedList<>();
     }
 

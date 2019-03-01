@@ -3,18 +3,24 @@ package com.owary;
 import com.owary.action.KeyInput;
 import com.owary.adjustments.Strategy;
 import com.owary.extra.HUD;
+import com.owary.extra.PauseMenu;
+import com.owary.extra.SettingsMenu;
+import com.owary.extra.StartMenu;
+import com.owary.handler.HUDHandler;
 import com.owary.handler.Handler;
-import com.owary.handler.HandlerImpl;
-import com.owary.model.enemy.Bomb;
+import com.owary.handler.GameObjectHandler;
+import com.owary.model.GameObject;
 import com.owary.model.player.Player;
 import com.owary.model.types.ID;
+import com.owary.adjustments.State;
 import com.owary.utils.Utils;
 import com.owary.adjustments.Level;
 
 import java.awt.*;
 import java.awt.image.BufferStrategy;
-import java.util.Random;
 import java.util.logging.Logger;
+
+import static com.owary.adjustments.State.*;
 
 /**
  * @author Grama
@@ -23,13 +29,24 @@ public class Game extends Canvas implements Runnable {
 
     public static int WIDTH, HEIGHT;  // Your game Canvas dimensions.
     private Thread thread;
-    private final Handler handler;
-    private final HUD hud;
+    private static Handler<GameObject> gameObjectHandler;
+    private static Handler<HUD> hudHandler;
+
+    private static HUD hudPlayerOne;
+    private static HUD hudPlayerTwo;
+
+    private static StartMenu startMenu;
+    private static PauseMenu pauseMenu;
+    private static SettingsMenu settingsMenu;
+
     private Level level;
-    private final STATE gameState = STATE.GAME;
+    private static State gameState = MENU;
     private boolean running = false;
 
-    private final Player playerOne;
+    public volatile static boolean paused = false;
+
+    private static Player playerOne;
+    private static Player playerTwo;
 
     public static void main(String[] args) {
         new Game();
@@ -41,19 +58,26 @@ public class Game extends Canvas implements Runnable {
         WIDTH = screenSize.width;
         HEIGHT = screenSize.height;
 
+        HUD.screenWidth = WIDTH;
+        HUD.screenHeight = HEIGHT;
+
         level = Level.ONE;
-        handler = new HandlerImpl();
-        playerOne = new Player(400, 200, handler, Utils.getArrowControl());
+        gameObjectHandler = new GameObjectHandler();
+        hudHandler = new HUDHandler();
 
-        hud = new HUD(playerOne);
+        playerOne = new Player(400, 200, gameObjectHandler, Utils.getArrowControl());
 
-        this.addKeyListener(new KeyInput(this, playerOne));
+        playerTwo = new Player(800, 200, gameObjectHandler, Utils.getWASDControl());
+        playerTwo.setCharacterImage("assets/images/players/the_blues.png");
+
+        hudPlayerOne = new HUD(playerOne);
+
+        startMenu = new StartMenu(screenSize);
+        pauseMenu = new PauseMenu(screenSize);
+        settingsMenu = new SettingsMenu(screenSize);
+        this.addKeyListener(new KeyInput(playerOne, playerTwo));
 
         Window.start(WIDTH, HEIGHT, "The Game", this);
-
-        if (gameState == STATE.GAME) {
-            handler.addObject(playerOne);
-        }
 
     }
 
@@ -91,6 +115,11 @@ public class Game extends Canvas implements Runnable {
         int frames = 0;
 
         while (running) {
+            if (paused) {
+                lastTime = System.nanoTime();
+                render();
+                continue;
+            }
             long now = System.nanoTime();
             delta += (now - lastTime) / ns;
             lastTime = now;
@@ -112,15 +141,13 @@ public class Game extends Canvas implements Runnable {
     }
 
     private void tick() {
-        level = getCurrentLevel(playerOne);
-
-        for (ID key : ID.values()) {
-            Strategy.generateGameObject(key, level, handler);
-        }
-
-        handler.tick();
-        if (gameState == STATE.GAME) {
-            hud.tick();
+        if (gameState == GAME) {
+            hudHandler.tick();
+            level = getCurrentLevel(playerOne);
+            for (ID key : ID.values()) {
+                Strategy.generateGameObject(key, level, gameObjectHandler);
+            }
+            gameObjectHandler.tick();
         }
     }
 
@@ -148,28 +175,40 @@ public class Game extends Canvas implements Runnable {
         }
         Graphics g = bs.getDrawGraphics();
 
-        g.setColor(Color.PINK);
-        g.fillRect(0, 0, WIDTH, HEIGHT);
 
-        handler.render(g);
-
-        if (gameState == STATE.GAME) {
-
-            hud.render(g);
+        if (gameState == GAME) {
+            g.setColor(Color.PINK);
+            g.fillRect(0, 0, WIDTH, HEIGHT);
+            hudHandler.render(g);
+            gameObjectHandler.render(g);
+        }else if (gameState == MENU) {
+            startMenu.render(g);
+        }else if (gameState == PAUSED){
+            pauseMenu.render(g);
+        }else if (gameState == SETTINGS){
+            settingsMenu.render(g);
         }
         g.dispose();
         bs.show();
     }
 
-    /*
-     *You will not use this enum in our project, however its very common for game Menues .
-     */
-    private enum STATE {
-        MENU,
-        GAME,
-        HELP,
-        OPTIONS
+    public static void setGameState(State state) {
+        gameState = state;
     }
 
+    public static State getGameState() {
+        return gameState;
+    }
 
+    public static void addPlayers(){
+        if (gameState == GAME) {
+            gameObjectHandler.addObject(playerOne);
+            hudHandler.addObject(hudPlayerOne);
+            if (StartMenu.getCurrentMode() == TWO_PLAYERS){
+                hudPlayerTwo = new HUD(playerTwo, false);
+                gameObjectHandler.addObject(playerTwo);
+                hudHandler.addObject(hudPlayerTwo);
+            }
+        }
+    }
 }

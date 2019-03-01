@@ -2,6 +2,7 @@ package com.owary.utils;
 
 import com.owary.action.PlayerControlMapper;
 import com.owary.adjustments.Level;
+import com.owary.extra.Pointer;
 import com.owary.model.coin.Coin;
 import com.owary.model.enemy.Bomb;
 import com.owary.model.enemy.Chuck;
@@ -69,5 +70,49 @@ public class Utils {
         mapper.addControlMapping(KeyEvent.VK_RIGHT, 2);
         return mapper;
     }
+
+    public static void drawCenteredString(Graphics2D g, String text, int height, int width) {
+        // Font
+        Font font = new Font("Arial", Font.BOLD, 50);
+        // Get the FontMetrics
+        FontMetrics metrics = g.getFontMetrics(font);
+        // Determine the X coordinate for the text
+        int x = (width - metrics.stringWidth(text)) / 2;
+        // Determine the Y coordinate for the text (note we add the ascent, as in java 2d 0 is top of the screen)
+        int y = ((height - metrics.getHeight()) / 2) + metrics.getAscent();
+        // Set the font
+        g.setFont(font);
+        // Draw the String
+        g.drawString(text, x, y);
+    }
+
+    public static void drawCenteredString(Graphics2D g, String text, Rectangle rect) {
+        // Font
+        Font font = new Font("Arial", Font.BOLD, 50);
+        // Get the FontMetrics
+        FontMetrics metrics = g.getFontMetrics(font);
+        // Determine the X coordinate for the text
+        int x = rect.x + (rect.width - metrics.stringWidth(text)) / 2;
+        // Determine the Y coordinate for the text (note we add the ascent, as in java 2d 0 is top of the screen)
+        int y = rect.y + ((rect.height - metrics.getHeight()) / 2) + metrics.getAscent();
+        // Set the font
+        g.setFont(font);
+        // Draw the String
+        g.drawString(text, x, y);
+    }
+
+    /**
+     * This method draws a Rectangle/Button with a text inside it.
+     * @param g Graphics object
+     * @param text Text to put inside of the button
+     * @param rectangle the button
+     * @param order which order will it be selected
+     */
+    public static void drawButtons(Graphics2D g, String text, Rectangle rectangle, Pointer pointer, int order){
+        g.setColor(pointer.getCurrent() == order ? Color.YELLOW : Color.WHITE);
+        g.draw(rectangle);
+        drawCenteredString(g, text, rectangle);
+    }
+
 
 }

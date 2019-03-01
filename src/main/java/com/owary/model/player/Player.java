@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * @author Sayid Akhundov
  */
 public class Player extends GameObject {
-    private final Handler handler;
+    private final Handler<GameObject> handler;
 
     private final boolean[] keyPressed = new boolean[5];
 
@@ -30,7 +30,7 @@ public class Player extends GameObject {
 
     private final PlayerControlMapper controlMapper;
 
-    public Player(int x, int y, Handler handler, PlayerControlMapper controlMapper) {
+    public Player(int x, int y, Handler<GameObject> handler, PlayerControlMapper controlMapper) {
         super(x, y, ID.Player);
         this.handler = handler;
         this.controlMapper = controlMapper;
@@ -63,13 +63,13 @@ public class Player extends GameObject {
         x += velX;
         y += velY;
 
-        x = Game.clamp((int) x, 0, (int)(Game.WIDTH - (width + 5)));
-        y = Game.clamp((int) y, 0, (int)(Game.HEIGHT - (height + 18)));
+        x = Game.clamp( x, 0, (Game.WIDTH - (width + 5)));
+        y = Game.clamp( y, 0, (Game.HEIGHT - (height + 18)));
     }
 
     @Override
     public Rectangle getBounds() {
-        return new Rectangle((int) x, (int) y, (int) width, (int) height);
+        return new Rectangle( x,  y,  width,  height);
     }
 
     public int getHealth() {

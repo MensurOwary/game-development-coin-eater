@@ -44,12 +44,12 @@ public abstract class GameObject implements Serializable {
     public void render(Graphics g) {
         try {
             g.setColor(new Color(0,0,0,0));
-            g.fillOval((int) x, (int) y, (int) width, (int) height);
+            g.fillOval(x, y, width, height);
             Image resource = ResourceUtils.getResourceOf(this);
-            g.drawImage(resource, (int) x, (int) y, null);
+            g.drawImage(resource, x, y, null);
         } catch (IOException | NullPointerException e) {
             g.setColor(defaultColor);
-            g.fillRect((int) x, (int) y, (int) width, (int) height);
+            g.fillRect(x, y, width, height);
             System.out.println("Resource is null, fallback to a color");
         }
     }
