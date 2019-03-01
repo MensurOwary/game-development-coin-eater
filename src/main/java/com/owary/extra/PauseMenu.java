@@ -9,31 +9,30 @@ import java.io.IOException;
 import static com.owary.utils.Utils.drawButtons;
 import static com.owary.utils.Utils.drawCenteredString;
 
-public class StartMenu implements Menu{
+public class PauseMenu implements Menu{
 
-    private Rectangle singlePlayer;
-    private Rectangle twoPlayers;
-
+    private Rectangle resume;
+    private Rectangle menu;
     private Rectangle settings;
     private Rectangle exit;
 
-    private final int height;
-    private final int width;
+    private int height, width;
 
     private static Pointer pointer = new Pointer(4);
 
-    public StartMenu(Dimension dimension) {
+    public PauseMenu(Dimension dimension) {
         this.height = dimension.height;
         this.width = dimension.width;
 
-        singlePlayer = new Rectangle(width/2 - 150, height/2 - 175, 300, 100);
-        twoPlayers = new Rectangle(width/2 - 150, height/2 - 25, 300, 100);
+        resume = new Rectangle(width/2 - 150, height/2 - 175, 300, 100);
+        menu = new Rectangle(width/2 - 150, height/2 - 25, 300, 100);
         settings = new Rectangle(width/2 - 150, height/2 + 125, 300, 100);
         exit = new Rectangle(width/2 - 150, height/2 + 275, 300, 100);
     }
 
     @Override
     public void tick() {
+
     }
 
     @Override
@@ -51,18 +50,18 @@ public class StartMenu implements Menu{
         }
         // put title
         g.setColor(Color.WHITE);
-        drawCenteredString(g, "Coin Eater", height/3, width);
+        drawCenteredString(g, "Paused", height/3, width);
 
-        // put Single Player Mode
-        drawButtons(g, "1 Player", singlePlayer, pointer, 1);
+        // put Resume
+        drawButtons(g, "Resume", resume, pointer, 1);
 
-        // put Two Players Mode
-        drawButtons(g, "2 Players", twoPlayers, pointer, 2);
+        // put Menu
+        drawButtons(g, "Main Menu", menu, pointer, 2);
 
-        // put Two Players Mode
+        // put Settings
         drawButtons(g, "Settings", settings, pointer, 3);
 
-        // put Two Players Mode
+        // put Exit
         drawButtons(g, "Exit Game", exit, pointer, 4);
     }
 
@@ -76,9 +75,9 @@ public class StartMenu implements Menu{
     public static State getCurrentMode(){
         switch (pointer.getCurrent()){
             case 1:
-                return State.SINGLE_PLAYER;
+                return State.GAME;
             case 2:
-                return State.TWO_PLAYERS;
+                return State.MENU;
             case 3:
                 return State.SETTINGS;
             case 4:
@@ -87,5 +86,4 @@ public class StartMenu implements Menu{
                 return State.NO_OP;
         }
     }
-
 }

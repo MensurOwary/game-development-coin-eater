@@ -2,6 +2,7 @@ package com.owary.utils;
 
 import com.owary.action.PlayerControlMapper;
 import com.owary.adjustments.Level;
+import com.owary.extra.Pointer;
 import com.owary.model.coin.Coin;
 import com.owary.model.enemy.Bomb;
 import com.owary.model.enemy.Chuck;
@@ -98,6 +99,19 @@ public class Utils {
         g.setFont(font);
         // Draw the String
         g.drawString(text, x, y);
+    }
+
+    /**
+     * This method draws a Rectangle/Button with a text inside it.
+     * @param g Graphics object
+     * @param text Text to put inside of the button
+     * @param rectangle the button
+     * @param order which order will it be selected
+     */
+    public static void drawButtons(Graphics2D g, String text, Rectangle rectangle, Pointer pointer, int order){
+        g.setColor(pointer.getCurrent() == order ? Color.YELLOW : Color.WHITE);
+        g.draw(rectangle);
+        drawCenteredString(g, text, rectangle);
     }
 
 

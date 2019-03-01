@@ -3,6 +3,8 @@ package com.owary;
 import com.owary.action.KeyInput;
 import com.owary.adjustments.Strategy;
 import com.owary.extra.HUD;
+import com.owary.extra.PauseMenu;
+import com.owary.extra.SettingsMenu;
 import com.owary.extra.StartMenu;
 import com.owary.handler.HUDHandler;
 import com.owary.handler.Handler;
@@ -10,7 +12,7 @@ import com.owary.handler.GameObjectHandler;
 import com.owary.model.GameObject;
 import com.owary.model.player.Player;
 import com.owary.model.types.ID;
-import com.owary.model.types.State;
+import com.owary.adjustments.State;
 import com.owary.utils.Utils;
 import com.owary.adjustments.Level;
 
@@ -18,8 +20,7 @@ import java.awt.*;
 import java.awt.image.BufferStrategy;
 import java.util.logging.Logger;
 
-import static com.owary.model.types.State.GAME;
-import static com.owary.model.types.State.MENU;
+import static com.owary.adjustments.State.*;
 
 /**
  * @author Grama
@@ -34,7 +35,10 @@ public class Game extends Canvas implements Runnable {
     private static HUD hudPlayerOne;
     private static HUD hudPlayerTwo;
 
-    private static StartMenu menu;
+    private static StartMenu startMenu;
+    private static PauseMenu pauseMenu;
+    private static SettingsMenu settingsMenu;
+
     private Level level;
     private static State gameState = MENU;
     private boolean running = false;
@@ -68,8 +72,10 @@ public class Game extends Canvas implements Runnable {
 
         hudPlayerOne = new HUD(playerOne);
 
-        menu = new StartMenu(screenSize);
-        this.addKeyListener(new KeyInput(this, playerOne, playerTwo));
+        startMenu = new StartMenu(screenSize);
+        pauseMenu = new PauseMenu(screenSize);
+        settingsMenu = new SettingsMenu(screenSize);
+        this.addKeyListener(new KeyInput(playerOne, playerTwo));
 
         Window.start(WIDTH, HEIGHT, "The Game", this);
 
@@ -176,7 +182,11 @@ public class Game extends Canvas implements Runnable {
             hudHandler.render(g);
             gameObjectHandler.render(g);
         }else if (gameState == MENU) {
-            menu.render(g);
+            startMenu.render(g);
+        }else if (gameState == PAUSED){
+            pauseMenu.render(g);
+        }else if (gameState == SETTINGS){
+            settingsMenu.render(g);
         }
         g.dispose();
         bs.show();
@@ -194,7 +204,7 @@ public class Game extends Canvas implements Runnable {
         if (gameState == GAME) {
             gameObjectHandler.addObject(playerOne);
             hudHandler.addObject(hudPlayerOne);
-            if (!StartMenu.isSingleMode()){
+            if (StartMenu.getCurrentMode() == TWO_PLAYERS){
                 hudPlayerTwo = new HUD(playerTwo, false);
                 gameObjectHandler.addObject(playerTwo);
                 hudHandler.addObject(hudPlayerTwo);

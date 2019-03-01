@@ -18,6 +18,14 @@ public class Pointer {
         current++;
     }
 
+    public void previous(){
+        if (current == 1){
+            current = MAX;
+            return;
+        }
+        current--;
+    }
+
     public int getCurrent(){
         return current;
     }
