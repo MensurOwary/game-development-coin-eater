@@ -35,5 +35,23 @@ public class ResourceUtils {
         return scaledInstances.get(go.getCharacterImage());
     }
 
+    public static Image getResourceOf(String resource, int height, int width) throws IOException {
+        if (!scaledInstances.containsKey(resource)) {
+            InputStream imageStream = ClassLoader.getSystemClassLoader().getResourceAsStream(resource);
+
+            if (imageStream == null) {
+                throw new NullPointerException();
+            }
+
+            Image scaledInstance = ImageIO.read(imageStream).getScaledInstance(width, height, 0);
+            scaledInstances.put(resource, scaledInstance);
+
+            imageStream.close();
+
+            return scaledInstance;
+        }
+        return scaledInstances.get(resource);
+    }
+
 
 }

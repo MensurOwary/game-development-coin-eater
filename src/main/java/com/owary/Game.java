@@ -4,8 +4,10 @@ import com.owary.action.KeyInput;
 import com.owary.adjustments.Strategy;
 import com.owary.extra.HUD;
 import com.owary.extra.StartMenu;
+import com.owary.handler.HUDHandler;
 import com.owary.handler.Handler;
-import com.owary.handler.HandlerImpl;
+import com.owary.handler.GameObjectHandler;
+import com.owary.model.GameObject;
 import com.owary.model.player.Player;
 import com.owary.model.types.ID;
 import com.owary.model.types.State;
@@ -26,14 +28,21 @@ public class Game extends Canvas implements Runnable {
 
     public static int WIDTH, HEIGHT;  // Your game Canvas dimensions.
     private Thread thread;
-    private final Handler handler;
-    private final HUD hud;
-    private final StartMenu menu;
+    private static Handler<GameObject> gameObjectHandler;
+    private static Handler<HUD> hudHandler;
+
+    private static HUD hudPlayerOne;
+    private static HUD hudPlayerTwo;
+
+    private static StartMenu menu;
     private Level level;
-    private final State gameState = GAME;
+    private static State gameState = MENU;
     private boolean running = false;
 
-    private final Player playerOne;
+    public volatile static boolean paused = false;
+
+    private static Player playerOne;
+    private static Player playerTwo;
 
     public static void main(String[] args) {
         new Game();
@@ -45,20 +54,24 @@ public class Game extends Canvas implements Runnable {
         WIDTH = screenSize.width;
         HEIGHT = screenSize.height;
 
+        HUD.screenWidth = WIDTH;
+        HUD.screenHeight = HEIGHT;
+
         level = Level.ONE;
-        handler = new HandlerImpl();
-        playerOne = new Player(400, 200, handler, Utils.getArrowControl());
+        gameObjectHandler = new GameObjectHandler();
+        hudHandler = new HUDHandler();
 
-        hud = new HUD(playerOne);
+        playerOne = new Player(400, 200, gameObjectHandler, Utils.getArrowControl());
+
+        playerTwo = new Player(800, 200, gameObjectHandler, Utils.getWASDControl());
+        playerTwo.setCharacterImage("assets/images/players/the_blues.png");
+
+        hudPlayerOne = new HUD(playerOne);
+
         menu = new StartMenu(screenSize);
-
-        this.addKeyListener(new KeyInput(this, playerOne));
+        this.addKeyListener(new KeyInput(this, playerOne, playerTwo));
 
         Window.start(WIDTH, HEIGHT, "The Game", this);
-
-        if (gameState == GAME) {
-            handler.addObject(playerOne);
-        }
 
     }
 
@@ -96,6 +109,11 @@ public class Game extends Canvas implements Runnable {
         int frames = 0;
 
         while (running) {
+            if (paused) {
+                lastTime = System.nanoTime();
+                render();
+                continue;
+            }
             long now = System.nanoTime();
             delta += (now - lastTime) / ns;
             lastTime = now;
@@ -118,13 +136,13 @@ public class Game extends Canvas implements Runnable {
 
     private void tick() {
         if (gameState == GAME) {
-            hud.tick();
+            hudHandler.tick();
             level = getCurrentLevel(playerOne);
             for (ID key : ID.values()) {
-                Strategy.generateGameObject(key, level, handler);
+                Strategy.generateGameObject(key, level, gameObjectHandler);
             }
+            gameObjectHandler.tick();
         }
-        handler.tick();
     }
 
     private Level getCurrentLevel(Player playerOne) {
@@ -155,12 +173,32 @@ public class Game extends Canvas implements Runnable {
         if (gameState == GAME) {
             g.setColor(Color.PINK);
             g.fillRect(0, 0, WIDTH, HEIGHT);
-            hud.render(g);
-            handler.render(g);
+            hudHandler.render(g);
+            gameObjectHandler.render(g);
         }else if (gameState == MENU) {
             menu.render(g);
         }
         g.dispose();
         bs.show();
+    }
+
+    public static void setGameState(State state) {
+        gameState = state;
+    }
+
+    public static State getGameState() {
+        return gameState;
+    }
+
+    public static void addPlayers(){
+        if (gameState == GAME) {
+            gameObjectHandler.addObject(playerOne);
+            hudHandler.addObject(hudPlayerOne);
+            if (!StartMenu.isSingleMode()){
+                hudPlayerTwo = new HUD(playerTwo, false);
+                gameObjectHandler.addObject(playerTwo);
+                hudHandler.addObject(hudPlayerTwo);
+            }
+        }
     }
 }

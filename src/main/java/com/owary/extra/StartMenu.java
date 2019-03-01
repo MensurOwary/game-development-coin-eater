@@ -1,29 +1,68 @@
 package com.owary.extra;
 
+import com.owary.utils.ResourceUtils;
+
 import java.awt.*;
+import java.io.IOException;
 
-public class StartMenu {
+import static com.owary.utils.Utils.drawCenteredString;
 
-    private final Dimension dimension;
+public class StartMenu implements Menu{
+
+    private Rectangle singlePlayer;
+    private Rectangle twoPlayers;
+
+    private final int height;
+    private final int width;
+
+    private static boolean isSingle = true;
 
     public StartMenu(Dimension dimension) {
-        this.dimension = dimension;
+        this.height = dimension.height;
+        this.width = dimension.width;
+
+        singlePlayer = new Rectangle(width/2 - 150, height/2 - 50, 300, 100);
+        twoPlayers = new Rectangle(width/2 - 150, height/2 + 100, 300, 100);
     }
 
+    @Override
     public void tick() {
     }
 
-    public void render(Graphics g) {
-        Font font = new Font("arial", Font.BOLD, 50);
+    @Override
+    public void render(Graphics g1) {
+        Graphics2D g = (Graphics2D) g1;
 
-        int height = dimension.height;
-        int width = dimension.width;
-
-        g.setColor(new Color(128, 128, 128, 100));
-        g.fillRect(0, 0, width, height);
-
+        Image resource;
+        try {
+            resource = ResourceUtils.getResourceOf("assets/images/bg/bg.jpg", height, width);
+            g.drawImage(resource, 0, 0, null);
+        } catch (IOException e) {
+            g.setColor(new Color(128, 128, 128, 100));
+            g.fillRect(0, 0, width, height);
+            e.printStackTrace();
+        }
+        // put title
         g.setColor(Color.WHITE);
-        g.drawString("Coin Eater", width/2, height/2);
+        drawCenteredString(g, "Coin Eater", height/3, width);
+
+        // put Single Player Mode
+        g.setColor(isSingle ? Color.YELLOW : Color.WHITE);
+        g.draw(singlePlayer);
+        drawCenteredString(g, "1 Player", singlePlayer);
+
+        // put Two Players Mode
+        g.setColor(!isSingle ? Color.YELLOW : Color.WHITE);
+        g.draw(twoPlayers);
+        drawCenteredString(g, "2 Players", twoPlayers);
+    }
+
+    public static void switchMode(){
+        isSingle = !isSingle;
+    }
+
+    public static boolean isSingleMode(){
+        return isSingle;
     }
 
 }
