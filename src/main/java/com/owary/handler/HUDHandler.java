@@ -1,7 +1,6 @@
 package com.owary.handler;
 
 import com.owary.extra.HUD;
-import com.owary.model.GameObject;
 import com.owary.model.player.Player;
 
 import java.awt.*;

@@ -20,7 +20,7 @@ public class GameObjectHandler implements Handler<GameObject>, Serializable {
     private Player player;
 
     public GameObjectHandler(){
-        this.objects = new LinkedList<>();
+        this.objects = new ArrayList<>();
     }
 
     @Override

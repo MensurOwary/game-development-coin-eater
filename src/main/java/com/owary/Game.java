@@ -66,6 +66,7 @@ public class Game extends Canvas implements Runnable {
         hudHandler = new HUDHandler();
 
         playerOne = new Player(400, 200, gameObjectHandler, Utils.getArrowControl());
+        gameObjectHandler.setPlayer(playerOne);
 
         playerTwo = new Player(800, 200, gameObjectHandler, Utils.getWASDControl());
         playerTwo.setCharacterImage("assets/images/players/the_blues.png");
@@ -78,7 +79,6 @@ public class Game extends Canvas implements Runnable {
         this.addKeyListener(new KeyInput(playerOne, playerTwo));
 
         Window.start(WIDTH, HEIGHT, "The Game", this);
-
     }
 
     public static int clamp(int number, int min, int max) {
@@ -177,7 +177,7 @@ public class Game extends Canvas implements Runnable {
 
 
         if (gameState == GAME) {
-            g.setColor(Color.PINK);
+            g.setColor(Color.lightGray);
             g.fillRect(0, 0, WIDTH, HEIGHT);
             hudHandler.render(g);
             gameObjectHandler.render(g);

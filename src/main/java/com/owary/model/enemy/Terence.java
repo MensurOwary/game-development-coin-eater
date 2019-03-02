@@ -8,6 +8,8 @@ public class Terence extends Enemy implements Weighted {
         super(x, y);
         velX = 0;
         velY = 0;
+        height = 50;
+        width = 50;
         characterImage = "assets/images/enemies/terence.png";
     }
 

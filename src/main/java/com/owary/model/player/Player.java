@@ -38,8 +38,6 @@ public class Player extends GameObject {
         this.defaultColor = Color.WHITE;
         this.height = 50;
         this.width = 50;
-
-        this.handler.setPlayer(this);
     }
 
     @Override

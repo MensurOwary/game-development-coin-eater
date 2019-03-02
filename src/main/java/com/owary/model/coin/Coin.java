@@ -32,11 +32,11 @@ public class Coin extends GameObject implements Weighted {
 
     @Override
     public Rectangle getBounds() {
-        return new Rectangle((int)x, (int)y, (int)width, (int)height);
+        return new Rectangle(x, y, width, height);
     }
 
     @Override
     public int getWeight() {
-        return 25;
+        return 50;
     }
 }

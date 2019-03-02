@@ -13,7 +13,7 @@ import static java.util.stream.Collectors.groupingBy;
 
 public class Strategy {
 
-    public static void generateGameObject(ID type, Level level, Handler handler){
+    public static void generateGameObject(ID type, Level level, Handler<GameObject> handler){
         List<GameObject> objects = handler.getObjects();
         Map<ID, List<GameObject>> collect = objects
                 .stream()
@@ -38,7 +38,7 @@ public class Strategy {
             coinCount = 1;
             healthCount = 2;
         }else if(level.equals(Level.FOUR)){
-            enemyCount = 5;
+            enemyCount = 6;
             coinCount = 1;
             healthCount = 1;
         }

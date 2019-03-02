@@ -56,7 +56,6 @@ public class HUD {
         g.drawRect(x, y, 200, 32);
 
         g.drawString("Score : " + score, scoreTextLocation, 20);
-
     }
 
 
